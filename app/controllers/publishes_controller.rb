@@ -4,26 +4,64 @@ class PublishesController < ApplicationController
   
   # GET /publishes
   def index
-    @publishes = Publish.all
+    @publishes = Publish.all.where(user_id:current_user.id)
 
     render json: @publishes
   end
 
-  # GET /publishes/1
+  
+
+  # GET /publishes
   def show
     render json: @publish
   end
+  
+
+
+
+
+
+
+
+
 
   # POST /publishes
+  # def create
+  #   @publish = current_user.publishes.new(publish_params)
+    
+
+  #   if @publish.save
+  #     render json: @publish, status: :created, location: @publish
+  #   else
+  #     render json: @publish.errors, status: :unprocessable_entity
+  #   end
+  # end
+
+
   def create
     @publish = current_user.publishes.new(publish_params)
-
-    if @publish.save
-      render json: @publish, status: :created, location: @publish
+  
+    if current_user.vehicles.exists?(id: @publish.vehicle_id)
+      if @publish.save
+        render json: @publish, status: :created, location: @publish
+      else
+        render json: @publish.errors, status: :unprocessable_entity
+      end
     else
-      render json: @publish.errors, status: :unprocessable_entity
+      render json: { error: 'Invalid vehicle_id' }, status: :unprocessable_entity
     end
   end
+  
+  
+  
+  
+  
+  
+
+
+
+
+
 
   # PATCH/PUT /publishes/1
   def update
@@ -43,19 +81,6 @@ class PublishesController < ApplicationController
 
 
 
- 
-
-
-
-
-  
-  
-  
-  
-
-
-  
-
   private
   
   def set_publish
@@ -63,6 +88,9 @@ class PublishesController < ApplicationController
   end
 
   def publish_params
-    params.require(:publish).permit(:source, :destination, :source_longitude, :source_latitude, :destination_longitude, :destination_latitude, :passengers_count, :add_city, :date, :time, :set_price, :about_ride, :select_car)
+    params.require(:publish).permit(:source, :destination, :source_longitude, :source_latitude, :destination_longitude, :destination_latitude, :passengers_count, :add_city, :date, :time, :set_price, :about_ride, :vehicle_id, :book_instantly, :mid_seat, select_route: {}).tap do |whitelisted|
+      whitelisted[:vehicle_id] = params[:publish][:vehicle_id] if params[:publish].has_key?(:vehicle_id)
+    end
   end
+  
 end

@@ -10,4 +10,9 @@ class Publish < ApplicationRecord
            source_longitude, source_latitude, source_radius * 1000,
            destination_longitude, destination_latitude, destination_radius * 1000)
   }
+
+
+
+
+
 end

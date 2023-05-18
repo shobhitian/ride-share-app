@@ -17,6 +17,8 @@ gem 'activerecord'
 # gem "jbuilder"
 gem 'devise', '~> 4.9', '>= 4.9.2'
 gem 'devise-jwt'
+
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
 gem 'mailtrap'
@@ -56,3 +58,6 @@ end
 gem "geocoder"
 gem 'google_maps_service'
 gem "rgeo"
+
+gem 'httparty'
+

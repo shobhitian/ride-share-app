@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
+  require 'two_factor'
   has_many :vehicles
+
+  
   
   has_many :publishes
   devise :database_authenticatable, :registerable,
@@ -15,8 +18,16 @@ class User < ApplicationRecord
         validate :password_complexity
         #custom validation on image
         validate :image_format
+        #for chatting
+        has_many :chats
 
 
+
+        #for ratting 
+        has_many :given_ratings, class_name: 'Rating', foreign_key: 'rating_user_id'
+        has_many :received_ratings, class_name: 'Rating', foreign_key: 'rated_user_id'
+
+        
 
         validates :first_name, presence: true, format: { with: /\A[a-zA-Z]+\z/, message: "only allows letters" }
         validates :last_name, presence: true, format: { with: /\A[a-zA-Z]+\z/, message: "only allows letters" }
@@ -29,12 +40,71 @@ class User < ApplicationRecord
         before_create :create_activation_digest
 
 
+
+
+
+
+          # Add a method to calculate the average rating
+          def average_rating
+            received_ratings.average(:value)
+          end
+
+
+
+          def update_average_rating
+            update(average_rating: received_ratings.average(:value))
+          end
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+        
+     # foe sending otp and verification
+
+        def send_passcode
+          response = TwoFactor.send_passcode(phone_number)
+          if response && response['Status'].to_s.downcase == 'success'
+            update_column(:session_key, response['Details'])
+            true
+          else
+            false
+          end
+        end
+        
+      
+        def verify_passcode(passcode)
+          TwoFactor.verify_passcode(session_key, passcode)['Status'].to_s.downcase == 'success'
+        end
+
+
+
+
+     #password validation 
+
         def password_complexity
           if password.present? && !password.match(/\A(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/)
             errors.add(:password, "must include at least one lowercase letter, one uppercase letter, and one special character")
           end
         end
 
+
+
+
+      
+  # for email verification 
         def send_activation_email
           UserMailer.account_activation(self).deliver_now
         end
@@ -66,7 +136,7 @@ class User < ApplicationRecord
 
 
 
- # for image validation
+        # for image validation
         def image_format
           return unless image.attached?
       
