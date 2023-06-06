@@ -25,6 +25,9 @@ gem 'mailtrap'
 gem 'activestorage'
 
 
+gem 'rpush'
+
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
@@ -53,11 +56,16 @@ group :development do
   # gem "spring"
 end
 
-
+gem 'whenever', require: false
 
 gem "geocoder"
 gem 'google_maps_service'
 gem "rgeo"
 
 gem 'httparty'
+
+gem 'zeitwerk'
+gem 'actioncable'
+gem 'devise-two-factor'
+gem 'redis'
 

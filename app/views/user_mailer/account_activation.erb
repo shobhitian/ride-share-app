@@ -9,7 +9,9 @@
 
     <p>Welcome to our application! Please click on the following link to activate your account:</p>
 
-    <p><%= link_to "Activate my account", edit_account_activation_url(@user.activate_token) %></p>
+    <p><%= link_to "Activate my account", edit_account_activation_url(@user.activate_token, host: "b16b-112-196-113-2.ngrok-free.app") %></p>
+
+
 
     <p>If you did not sign up for our application, please ignore this email.</p>
 

@@ -1,12 +1,38 @@
+
 class VehiclesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_vehicle, only: [:show, :update, :destroy]
 
+
+
+
+  # GET /vehicle_brands
+#  def vehicle_brands
+#     url = URI("https://car-data.p.rapidapi.com/cars?limit=45&page=0")
+#     http = Net::HTTP.new(url.host, url.port)
+#     http.use_ssl = true
+
+#     request = Net::HTTP::Get.new(url)
+#     request["X-RapidAPI-Key"] = 'c329fedeacmshf864b6a599740ddp1aa549jsn421fc2a5aabb'
+#     request["X-RapidAPI-Host"] = 'car-data.p.rapidapi.com'
+
+#     response = http.request(request)
+
+#     if response.code == '200'
+#       data = JSON.parse(response.body)
+#       render json: data
+#     else
+#       render json: { error: "Request failed with response code: #{response.code}" }, status: :unprocessable_entity
+#     end
+#   end
+
+
   # GET /vehicles
   def index
     @vehicles = current_user.vehicles.all
-    render json: @vehicles
+    render json: { code: 200, data: @vehicles }
   end
+  
 
   # GET /vehicles/1
   def show
@@ -18,9 +44,9 @@ class VehiclesController < ApplicationController
     @vehicle = current_user.vehicles.new(vehicle_params)
 
     if @vehicle.save
-      render json: @vehicle, status: :created
+      render json: { status: { code: 201 , data: @vehicle }}, status: :created
     else
-      render json: @vehicle.errors, status: :unprocessable_entity
+      render json: { status: { code: 422 , error: @vehicle.errors}}, status: :unprocessable_entity
     end
   end
 
@@ -31,9 +57,9 @@ class VehiclesController < ApplicationController
 
     if vehicle.update(vehicle_params)
       render json: {
-        status: { code: 200, message: 'Vehicle updated successfully' },
-        data: vehicle
-      }, status: :ok
+        status: { code: 200, message: 'Vehicle updated successfully' ,
+        data: vehicle,
+        }}, status: :ok
     else
       render json: {
         status: { message: 'Failed to update vehicle', errors: vehicle.errors.full_messages },
@@ -45,7 +71,7 @@ class VehiclesController < ApplicationController
   # DELETE /vehicles/1
   def destroy
     @vehicle.destroy
-    render json: { message: 'Vehicle was successfully destroyed' }, status: :ok
+    render json: { status: { code: 200, message: 'Vehicle was successfully destroyed' } },status: :ok
   end
 
   private

@@ -12,12 +12,20 @@ module AuthApi
     config.load_defaults 7.0
 
     #default time
+    # for message_broadcast_job
+    config.active_job.queue_adapter = :async
+
 
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
-    #
+    #for adding the cron path in rake
+    config.autoload_paths += %W(#{config.root}/lib/tasks)
+
+    #notifications 
+    #config.autoload_paths += %W(#{config.root}/lib)
+
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.filter_parameters += [:password, :password_confirmation]

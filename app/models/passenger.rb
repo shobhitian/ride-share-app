@@ -11,7 +11,8 @@ class Passenger < ApplicationRecord
 
   def validate_unique_booking
     if Passenger.exists?(publish_id: publish_id, user_id: user_id)
-      errors.add(:message, "You have already booked this ride")
+      errors.add(:base, "You have already booked this ride")
     end
   end
+  
 end

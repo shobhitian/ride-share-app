@@ -70,7 +70,9 @@ GEM
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     builder (3.2.4)
+    chronic (0.10.2)
     concurrent-ruby (1.2.2)
+    connection_pool (2.4.1)
     crass (1.0.6)
     date (3.3.3)
     debug (1.7.2)
@@ -85,6 +87,11 @@ GEM
     devise-jwt (0.10.0)
       devise (~> 4.0)
       warden-jwt_auth (~> 0.6)
+    devise-two-factor (5.0.0)
+      activesupport (~> 7.0)
+      devise (~> 4.0)
+      railties (~> 7.0)
+      rotp (~> 6.0)
     dry-auto_inject (1.0.1)
       dry-core (~> 1.0)
       zeitwerk (~> 2.6)
@@ -102,6 +109,8 @@ GEM
       hurley (~> 0.1)
       multi_json (~> 1.11)
       retriable (~> 2.0)
+    hkdf (0.3.0)
+    http-2 (0.11.0)
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -128,6 +137,10 @@ GEM
     msgpack (1.7.0)
     multi_json (1.15.0)
     multi_xml (0.6.0)
+    net-http-persistent (4.0.2)
+      connection_pool (~> 2.2)
+    net-http2 (0.18.5)
+      http-2 (~> 0.11)
     net-imap (0.3.4)
       date
       net-protocol
@@ -176,7 +189,12 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0)
       zeitwerk (~> 2.5)
+    rainbow (3.1.1)
     rake (13.0.6)
+    redis (5.0.6)
+      redis-client (>= 0.9.0)
+    redis-client (0.14.1)
+      connection_pool
     reline (0.3.3)
       io-console (~> 0.5)
     responders (3.1.0)
@@ -184,6 +202,17 @@ GEM
       railties (>= 5.2)
     retriable (2.1.0)
     rgeo (3.0.0)
+    rotp (6.2.2)
+    rpush (7.0.1)
+      activesupport (>= 5.2)
+      jwt (>= 1.5.6)
+      multi_json (~> 1.0)
+      net-http-persistent
+      net-http2 (~> 0.18, >= 0.18.3)
+      railties
+      rainbow
+      thor (>= 0.18.1, < 2.0)
+      webpush (~> 1.0)
     thor (1.2.1)
     timeout (0.3.2)
     tzinfo (2.0.6)
@@ -195,21 +224,28 @@ GEM
       dry-configurable (>= 0.13, < 2)
       jwt (~> 2.1)
       warden (~> 1.2)
+    webpush (1.1.0)
+      hkdf (~> 0.2)
+      jwt (~> 2.0)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    whenever (1.0.0)
+      chronic (>= 0.6.3)
     zeitwerk (2.6.7)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  actioncable
   activerecord
   activestorage
   bootsnap
   debug
   devise (~> 4.9, >= 4.9.2)
   devise-jwt
+  devise-two-factor
   geocoder
   google_maps_service
   httparty
@@ -218,8 +254,12 @@ DEPENDENCIES
   puma (~> 5.0)
   rack-cors
   rails (~> 7.0.4, >= 7.0.4.3)
+  redis
   rgeo
+  rpush
   tzinfo-data
+  whenever
+  zeitwerk
 
 RUBY VERSION
    ruby 3.2.1p31

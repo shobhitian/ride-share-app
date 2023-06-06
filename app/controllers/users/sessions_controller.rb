@@ -15,11 +15,11 @@ class Users::SessionsController < Devise::SessionsController
   def respond_with(resource, options={})
     if current_user.nil?
       render json:{
-        status: { code: 400, error: 'Error occurred while signing in'}
+        status: { code: 400, error: resource.errors.full_messages.join(", ") }
       }, status: :bad_request
     else
       render json: {
-        status: { code: 200, message: 'User Signed in successfully', data: current_user }
+        status: { code: 200, message: 'User Signed in successfully', data: current_user, image_url: current_user.image.attached? ? url_for(current_user.image) : nil }
       }, status: :ok
       end
   end
@@ -44,3 +44,16 @@ class Users::SessionsController < Devise::SessionsController
     end
   end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+

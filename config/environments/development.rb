@@ -52,30 +52,53 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
-  #config.hosts << "93e5-112-196-113-2.ngrok-free.app"
+  
 
 
   #config.action_controller.default_url_options = { host: 'imaginative-concha-5b2766.netlify.app', protocol: 'https' }
 
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+  config.action_mailer.default_url_options = { host: 'https://0e25-112-196-113-2.ngrok-free.app' }
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
-  config.hosts << "e3cc-112-196-113-2.in.ngrok.io"
+  config.hosts << "0e25-112-196-113-2.ngrok-free.app"
+    #config.hosts << ENV['HOSTS']
+  #for real time messaging
+  config.action_cable.url = 'wss://0e25-112-196-113-2.ngrok-free.app'
+  #config.action_cable.url = 'ws://localhost:3000/cable'
+
+
+  config.action_cable.allowed_request_origins = ['https://0e25-112-196-113-2.ngrok-free.app']
+
 
  
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    :user_name => 'a55699a510d9b8',
-    :password => '2ae75d4ad68c37',
-    :address => 'sandbox.smtp.mailtrap.io',
-    :domain => 'sandbox.smtp.mailtrap.io',
-    :port => '2525',
-    :authentication => :cram_md5
-  }
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #   :user_name => 'a55699a510d9b8',
+  #   :password => '2ae75d4ad68c37',
+  #   :address => 'sandbox.smtp.mailtrap.io',
+  #   :domain => 'sandbox.smtp.mailtrap.io',
+  #   :port => '2525',
+  #   :authentication => :cram_md5
+  # }
+
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              'smtp.gmail.com',
+      port:                 587,
+      domain:               '8697-112-196-113-2.ngrok-free.app',
+      user_name:            'harpreetvallah2@gmail.com',
+      password:             'fvjfwycrflgltfgz',
+      authentication:       'plain',
+      enable_starttls_auto: true,
+     }
+
+
   config.action_mailer.perform_deliveries = true
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   # Uncomment if you wish to allow Action Cable access from any origin.
-  # config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.mount_path = '/cable'
+
 end

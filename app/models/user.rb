@@ -2,8 +2,11 @@ class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
   require 'two_factor'
   has_many :vehicles
+  has_many :device_infos
 
   
+  
+
   
   has_many :publishes
   devise :database_authenticatable, :registerable,
@@ -19,7 +22,7 @@ class User < ApplicationRecord
         #custom validation on image
         validate :image_format
         #for chatting
-        has_many :chats
+        has_many :messages
 
 
 
@@ -28,21 +31,50 @@ class User < ApplicationRecord
         has_many :received_ratings, class_name: 'Rating', foreign_key: 'rated_user_id'
 
         
-
+        before_validation :trim_first_name
         validates :first_name, presence: true, format: { with: /\A[a-zA-Z]+\z/, message: "only allows letters" }
+        
+        before_validation :trim_last_name
         validates :last_name, presence: true, format: { with: /\A[a-zA-Z]+\z/, message: "only allows letters" }
-        validates :phone_number,length: { is: 10 }, numericality: { only_integer: true },allow_blank: true
+        validates :phone_number, uniqueness: true, length: { is: 10 }, numericality: { only_integer: true }, allow_blank: true
 
-
+        validate :dob_must_be_more_than_14_years_ago
         validates :dob, presence: true
         validates :title, presence: true
         has_one_attached :image
         before_create :create_activation_digest
 
 
+         
 
+      #notifications
+      def send_notification_to_user(title, description)
+        payload = {payload: { title: title , description: description } }
+        android_condition = "device_type = 'android' and user_id = #{id.to_i}"
+        ios_condition = "device_type = 'ios' and user_id = #{id.to_i}"
+        send_notification(payload, android_condition, 'android')
+        send_notification(payload, ios_condition, 'ios')
+      end
+    
+      def send_notification(payload, condition, device_type)
+        tokens = DeviceInfo.where(condition).pluck(:device_token).compact
+          DeviceInfo.send_notification(tokens, payload, device_type)
+      end
 
+        
+        #validations 
+        def trim_first_name
+          first_name.strip! if first_name.present?
+        end
+        def trim_last_name
+          last_name.strip! if last_name.present?
+        end
 
+        def dob_must_be_more_than_14_years_ago
+          if dob.present? && dob > 14.years.ago.to_date
+            errors.add(:dob, "must be more than 14 years ago")
+          end
+        end
 
           # Add a method to calculate the average rating
           def average_rating
@@ -140,7 +172,7 @@ class User < ApplicationRecord
         def image_format
           return unless image.attached?
       
-          unless image.content_type.in?(%w[image/jpeg image/png])
+          unless image.content_type.in?(%w[image/jpeg image/png image/png])
             errors.add(:image)
           end
         end
