@@ -2,18 +2,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
   
   respond_to :json
  
-  # Custom response for user registration
-  # def respond_with(resource, options = {})
-  #   if resource.persisted?
-  #     #token = request.env['warden-jwt_auth.token']
-  #     render json: {
-  #       status: { code: 200, message: 'Signed up successfully', data: resource },
-  #       #token: "Bearer #{token}"
-  #     }, status: :ok
-  #   else
-  #     render plain: resource.errors.full_messages.first, status: :unprocessable_entity
-  #   end
-  # end
   def email_check
     user = User.find_by(email: params[:email])
     if user
@@ -22,17 +10,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  # def respond_with(resource, options={})
-  #   if resource.persisted?
-  #     render json: {
-  #       status: { code: 200, message: 'Signed up successfully' ,
-  #       data: resource }
-  #     }, status: :ok
-  #     else
-  #       render plain: resource.errors.full_messages.first, status: :unprocessable_entity
 
-  #   end
-  # end
   
   def respond_with(resource, options={})
     if resource.persisted?
@@ -48,32 +26,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
 
-  
 
-
-  
-  
-  
-
-
-
-  
-
-  # Update user information
-  # def update
-  #   user = current_user
-  #   if user.update(user_params)
-  #     render json: {
-  #       status: { code: 200, message: 'User updated successfully',image_url: current_user.image.attached? ? url_for(current_user.image) : nil, data: user },
-  #       }
-  #   else
-  #     render json: {
-  #       status: { code: 422, message: 'User could not be updated', errors: user.errors.full_messages }
-  #     }, status: :unprocessable_entity
-  #   end
-  # rescue ActiveRecord::RecordNotFound => error
-  #   render json: { error: error.message }, status: :unauthorized
-  # end
 
   def update
     user = current_user
@@ -122,6 +75,20 @@ class Users::RegistrationsController < Devise::RegistrationsController
       render json: { errors: 'User not found' }, status: :not_found
     end
   end
+
+
+  def find_user_by_id
+    user = User.find(params[:id])
+
+    if user
+      render json: { user: user }, status: :ok
+    else
+      render json: { error: 'User not found' }, status: :not_found
+    end
+  end
+
+ 
+
   
   
   private

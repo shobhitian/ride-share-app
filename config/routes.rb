@@ -35,11 +35,15 @@ Rails.application.routes.draw do
   #users routes
   devise_scope :user do
     get '/users', to: 'users/registrations#show', as: :user_profile
+   
     delete '/users', to: 'users/registrations#destroy'
     post '/verify', to: 'authentication#verify'
     post '/phone', to: 'authentication#phone'
     post '/phonesignup', to: 'authentication#phonesignup'
     get '/email_check', to:'users/registrations#email_check'
+    get 'users/:id', to: 'users/sessions#find_user_by_id'
+
+    
   end
   put '/user_images', to: 'user_images#update'
   get '/user_images', to: 'user_images#show'
@@ -51,7 +55,7 @@ Rails.application.routes.draw do
   end
 
 
-  post 'publishes/:id/cancel_publish', to: 'publishes#cancel_publish'
+  post 'cancel_publish', to: 'publishes#cancel_publish'
   post 'publishes/:id/complete_publish', to: 'publishes#complete_publish'
   get '/publishes/:id', to: 'publishes#show', as: 'show_publish'
 

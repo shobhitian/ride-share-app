@@ -6,7 +6,16 @@ class Users::SessionsController < Devise::SessionsController
   
   
   
-  
+   #find user by id
+   def find_user_by_id
+    user = User.find(params[:id])
+
+    if user
+      render json: {code: 200, user: user }, status: :ok
+    else
+      render json: {code: 404, error: 'User not found' }, status: :not_found
+    end
+  end
   
 
 

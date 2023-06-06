@@ -3,12 +3,27 @@ class PassengersController < ApplicationController
 
 
 #to show all booked rides from current user
+  # def booked_publishes
+  #   booked_passengers = Passenger.where(user_id: current_user.id)
+  #   rides = booked_passengers.map { |passenger| passenger.publish }
+
+  #   render json: { code: 200, rides: rides }, status: :ok
+  # end
   def booked_publishes
     booked_passengers = Passenger.where(user_id: current_user.id)
-    rides = booked_passengers.map { |passenger| passenger.publish }
-
+    rides = booked_passengers.map do |passenger|
+      {
+        ride: passenger.publish,
+        booking_id: passenger.id,
+        seat: passenger.seats,
+        status: passenger.status,
+       
+      }
+    end
+  
     render json: { code: 200, rides: rides }, status: :ok
   end
+  
 
   def book_publish
     publish = Publish.find_by(id: params[:passenger][:publish_id])

@@ -13,18 +13,34 @@ class PublishesController < ApplicationController
     @rides = Passenger.where(publish_id: @publish.id)
     @user = User.find_by(id: @publish.user_id)
     @vehicle = Vehicle.find_by(id: @publish.vehicle_id)
+    @passengers = Passenger.find_by(id: @publish.id)
     passengers = []
     @rides.each do |ride|
       user = User.find_by(id: ride.user_id)
-      passengers << user.first_name if user.present?
+     
+      if user.present?
+        passenger = {
+          first_name: user.first_name,
+          last_name: user.last_name,
+         
+          dob: user.dob,
+          phone_verified: user.phone_verified,
+          image: user.image.attached? ? url_for(user.image) : nil,
+          average_rating: user.average_rating,
+          bio: user.bio,
+          travel_preferences: user.travel_preferences,
+          seats: ride.seats
+        }
+        passengers << passenger
+      end
     end
     render json: {
       status: 200,
       data: @publish,
-      first_name: @user.first_name,
+  
       passengers: passengers,
-      vehicle_name: @vehicle.vehicle_name,
-      vehicle_color: @vehicle.vehicle_color
+
+   
     }
   end
   
@@ -83,6 +99,7 @@ class PublishesController < ApplicationController
   end
 
   private
+ 
   
   def set_publish
     @publish = Publish.find(params[:id])
