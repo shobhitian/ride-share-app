@@ -3,63 +3,75 @@ class PassengersController < ApplicationController
 
 
 #to show all booked rides from current user
-  # def booked_publishes
-  #   booked_passengers = Passenger.where(user_id: current_user.id)
-  #   rides = booked_passengers.map { |passenger| passenger.publish }
+def booked_publishes
+  booked_passengers = Passenger.where(user_id: current_user.id)
+  rides = booked_passengers.map do |passenger|
+    publish = passenger.publish
 
-  #   render json: { code: 200, rides: rides }, status: :ok
-  # end
-  def booked_publishes
-    booked_passengers = Passenger.where(user_id: current_user.id)
-    rides = booked_passengers.map do |passenger|
-      {
-        ride: passenger.publish,
-        booking_id: passenger.id,
-        seat: passenger.seats,
-        status: passenger.status,
-       
-      }
-    end
-  
-    render json: { code: 200, rides: rides }, status: :ok
+    time = extract_time(publish.time)
+    estimate_time = extract_time(publish.estimate_time)
+    reach_time = calculate_reach_time(publish.date, time, estimate_time)
+
+    {
+      ride: publish,
+      booking_id: passenger.id,
+      seat: passenger.seats,
+      status: passenger.status,
+      reach_time: reach_time
+    }
   end
+
+  render json: { code: 200, rides: rides }, status: :ok
+end
+
   
 
   def book_publish
     publish = Publish.find_by(id: params[:passenger][:publish_id])
-
+  
     if publish
       if publish.user_id == current_user.id
-        render json: {code: 422, error: "You cannot book your own published ride" }, status: :unprocessable_entity
+        render json: { code: 422, error: "You cannot book your own published ride" }, status: :unprocessable_entity
         return
       end
-
+  
       if publish.passengers_count > 0
         seats = params[:passenger][:seats].to_i
-
+  
         if publish.passengers_count >= seats
-          @passenger = Passenger.new(book_params)
-          @passenger.price = publish.set_price * seats
-          @passenger.status = "confirm booking"
-
-          if @passenger.save
+          # Check if the user has previously booked the ride
+          passenger = Passenger.find_by(publish_id: publish.id, user_id: current_user.id)
+  
+          if passenger && passenger.status == "cancel booking"
+            # Update the existing passenger record
+            passenger.update(status: "confirm booking", seats: seats, price: publish.set_price * seats)
             publish.update(passengers_count: publish.passengers_count - seats)
-            render json: { code: 201, passenger: @passenger }, status: :created
+  
+            render json: { code: 200, passenger: passenger }, status: :ok
           else
-            error_message = @passenger.errors.full_messages.first
-            
-            render json: { code: 422, error: error_message }, status: :unprocessable_entity
+            @passenger = Passenger.new(book_params)
+            @passenger.price = publish.set_price * seats
+            @passenger.status = "confirm booking"
+  
+            if @passenger.save
+              publish.update(passengers_count: publish.passengers_count - seats)
+              render json: { code: 201, passenger: @passenger }, status: :created
+            else
+              error_message = @passenger.errors.full_messages.first
+              render json: { code: 422, error: error_message }, status: :unprocessable_entity
+            end
           end
         else
           render json: { code: 422, error: "Insufficient seats available" }, status: :unprocessable_entity
         end
       else
-        render json: { code:422, error: "No seats available for this ride" }, status: :unprocessable_entity
+        render json: { code: 422, error: "No seats available for this ride" }, status: :unprocessable_entity
       end
     else
-      render json: { code:422, error: "Invalid publish" }, status: :unprocessable_entity
+      render json: { code: 422, error: "Invalid publish" }, status: :unprocessable_entity
     end
   end
+  
 
   def cancel_booking
     @passenger = Passenger.find_by(id: params[:id])

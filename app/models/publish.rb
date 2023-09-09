@@ -7,7 +7,7 @@ class Publish < ApplicationRecord
   
   validates :passengers_count, presence: true, numericality: { greater_than_or_equal_to: 1, message: "must be 1 or more" }
 
-  validate :date_must_be_today_or_future
+  #validate :date_must_be_today_or_future
   #for latitude and longitude
   validates :source_latitude, numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }
   validates :source_longitude, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }
@@ -25,23 +25,13 @@ class Publish < ApplicationRecord
 
   reverse_geocoded_by :add_city_latitude, :add_city_longitude, address: :add_city
   enum status: { pending: 'pending', cancelled: 'cancelled', completed: 'completed', full: 'full' }
-  #before_save :trim_time_from_time
-
-
   
 
-  # def trim_time_from_time
-  #   if time.present?
-  #     time_obj = Time.parse(time.to_s)
-  #     self.time = time_obj.strftime("%H:%M:%S")
+  # def date_must_be_today_or_future
+  #   if date.present? && date < Date.current
+  #     errors.add(:date, "must be today or a future date")
   #   end
   # end
-
-  def date_must_be_today_or_future
-    if date.present? && date < Date.current
-      errors.add(:date, "must be today or a future date")
-    end
-  end
 
 
 end

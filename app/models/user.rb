@@ -22,7 +22,8 @@ class User < ApplicationRecord
         #custom validation on image
         validate :image_format
         #for chatting
-        has_many :messages
+        has_many :sent_messages, class_name: 'Message', foreign_key: 'sender_id'
+        has_many :received_messages, class_name: 'Message', foreign_key: 'receiver_id'
 
 
 
@@ -45,7 +46,16 @@ class User < ApplicationRecord
         before_create :create_activation_digest
 
 
-         
+        def image_url
+          # Assuming you have an `image` attribute that stores the image file name
+          if image.attached?
+            Rails.application.routes.url_helpers.url_for(image)
+          else
+            # Return a default image URL or handle the case when no image is attached
+            # For example:
+            ActionController::Base.helpers.asset_path('default-avatar.png')
+          end
+        end         
 
       #notifications
       def send_notification_to_user(title, description)

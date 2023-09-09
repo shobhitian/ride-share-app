@@ -11,7 +11,7 @@ class Users::SessionsController < Devise::SessionsController
     user = User.find(params[:id])
 
     if user
-      render json: {code: 200, user: user }, status: :ok
+      render json: { code: 200, user: user,  image_url: user.image.attached? ? url_for(user.image) : nil }, status: :ok
     else
       render json: {code: 404, error: 'User not found' }, status: :not_found
     end
@@ -27,6 +27,8 @@ class Users::SessionsController < Devise::SessionsController
         status: { code: 400, error: resource.errors.full_messages.join(", ") }
       }, status: :bad_request
     else
+      Rake::Task['rpush:android_app'].invoke
+      Rake::Task['rpush:ios_app'].invoke
       render json: {
         status: { code: 200, message: 'User Signed in successfully', data: current_user, image_url: current_user.image.attached? ? url_for(current_user.image) : nil }
       }, status: :ok
